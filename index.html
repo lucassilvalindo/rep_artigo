@@ -1,152 +1,75 @@
+
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desnormalização em Bancos de Dados: Quando a Redundância Compensa</title>
-    <style>
-        :root {
-            --primary-color: #1e293b;
-            --accent-color: #2563eb;
-            --bg-color: #f8fafc;
-            --text-color: #334155;
-            --code-bg: #f1f5f9;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-        }
-        nav {
-            background-color: #334155;
-            padding: 0.75rem;
-            text-align: center;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 1rem;
-            font-weight: 500;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        main {
-            max-width: 800px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        h1, h2, h3 {
-            color: var(--primary-color);
-        }
-        h2 {
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 0.3rem;
-            margin-top: 2rem;
-        }
-        pre {
-            background-color: var(--code-bg);
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-family: Consolas, Monaco, monospace;
-            font-size: 0.9rem;
-        }
-        .authors-card {
-            background: #f8fafc;
-            border-left: 4px solid var(--accent-color);
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            margin-top: 3rem;
-            font-size: 0.85rem;
-        }
-    </style>
+    <title>Normalizacao de Banco de Dados</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>Desnormalização em Bancos de Dados</h1>
-        <p>Quando a redundância controlada resolve problemas de desempenho em sistemas de grande escala.</p>
+        <h1>Normalizacao de Banco de Dados</h1>
+        <p>Organizando dados para evitar repeticoes e erros</p>
     </header>
 
     <nav>
-        <a href="#introducao">Introdução</a>
-        <a href="#conceito">Conceito</a>
-        <a href="#exemplo">Exemplo Prático</a>
-        <a href="#codigo">Código SQL</a>
-        <a href="#referencias">Referências</a>
+        <a href="#introducao">Introducao</a>
+        <a href="#primeira-forma">1FN</a>
+        <a href="#segunda-forma">2FN</a>
+        <a href="#terceira-forma">3FN</a>
+        <a href="#conclusao">Conclusao</a>
     </nav>
 
     <main>
-        <section id="autoria" class="authors-card">
-            <h3>Autoria</h3>
-            <p><strong>Grupo:</strong> Equipa de Engenharia e Modelagem de Dados</p>
-            <p><strong>Autores:</strong> Lucas[cite: 8] e Colegas de Turma (Estudantes de TI)</p>
-            <p><small>Publicado em: 15 de junho de 2026 | Última revisão: 15 de outubro de 2026</small>[cite: 5]</p>
-        </section>
-
         <section id="introducao">
-            <h2>1. Introdução a um Problema Real</h2>
-            <p>Imagine que gere um grande sistema de comércio eletrónico e precise de gerar um relatório analítico de vendas por estado. Num modelo estritamente normalizado (OLTP), os dados estão divididos por tabelas de clientes, produtos, pedidos e itens[cite: 4]. Para montar o relatório, o banco de dados é obrigado a executar múltiplos <code>JOIN</code>s em tempo de execução[cite: 4]. Quando a tabela atinge milhões de linhas, o custo desta operação degrada severamente o desempenho do sistema.</p>
-            <p>Neste artigo, vamos explorar porque razão a normalização nem sempre é o objetivo final e como a desnormalização introduz redundância controlada para otimizar leituras[cite: 4].</p>
+            <h2>O que e normalizacao?</h2>
+            <p>
+                A normalizacao e um processo de organizacao das tabelas
+                de um banco de dados. Ela ajuda a reduzir repeticoes,
+                evitar inconsistencias e manter as informacoes corretas.
+            </p>
         </section>
 
-        <section id="conceito">
-            <h2>2. O Conceito: OLTP vs OLAP</h2>
-            <p>Enquanto os sistemas <strong>OLTP</strong> (Online Transaction Processing) priorizam a integridade e evitam anomalias através da normalização (1FN, 2FN, 3FN), os sistemas <strong>OLAP</strong> (Online Analytical Processing) focam-se na velocidade de leitura de relatórios, utilizando estruturas agregadas ou tabelas "achatadas"[cite: 4].</p>
+        <section id="primeira-forma">
+            <h2>Primeira Forma Normal (1FN)</h2>
+            <p>
+                A 1FN exige que cada campo tenha um unico valor,
+                sem listas de valores dentro da mesma celula.
+            </p>
         </section>
 
-        <section id="exemplo">
-            <h2>3. Exemplo Prático: A Tabela Achatada</h2>
-            <p>Abaixo visualizamos a transição entre o modelo altamente normalizado e a tabela desnormalizada que duplica intencionalmente os dados do cliente e do produto para eliminar a necessidade de junções em consultas frequentes[cite: 4].</p>
+        <section id="segunda-forma">
+            <h2>Segunda Forma Normal (2FN)</h2>
+            <p>
+                A 2FN exige que a tabela esteja na 1FN e que cada
+                atributo que nao faz parte de uma chave dependa
+                da chave completa, sem dependencias parciais.
+            </p>
         </section>
 
-        <section id="codigo">
-            <h2>4. Scripts SQL</h2>
-            <p>Os scripts completos utilizados para testar este cenário num banco de dados limpo encontram-se no repositório do projeto[cite: 5, 6]. Abaixo está um excerto do modelo desnormalizado:</p>
-            <pre><code>CREATE TABLE relatorio_vendas_desnormalizado (
-    id SERIAL PRIMARY KEY,
-    pedido_id INT NOT NULL,
-    nome_cliente VARCHAR(100) NOT NULL,
-    estado_cliente VARCHAR(2) NOT NULL,
-    nome_produto VARCHAR(100) NOT NULL,
-    valor_total_item NUMERIC(10, 2) NOT NULL
-);</code></pre>
-            <p><small>Ver script completo na pasta <code>sql/desnormalizacao.sql</code> no GitHub.</small></p>
+        <section id="terceira-forma">
+            <h2>Terceira Forma Normal (3FN)</h2>
+            <p>
+                A 3FN exige que a tabela esteja na 2FN e evita
+                dependencias transitivas inadequadas entre atributos
+                que nao fazem parte de uma chave.
+            </p>
         </section>
 
-        <section id="referencias">
-            <h2>5. Referências e Leituras Recomendadas</h2>
-            <ul>
-                <li>Codd, E. F. (1970). <em>A Relational Model of Data for Large Shared Data Banks</em>[cite: 6].</li>
-                <li><a href="https://use-the-index-luke.com/" target="_blank">Use The Index, Luke</a> - Guia web sobre desempenho e índices de bases de dados[cite: 7].</li>
-                <li><a href="https://www.postgresql.org/docs/" target="_blank">Documentação Oficial do PostgreSQL</a>.</li>
-            </ul>
+        <section id="conclusao">
+            <h2>Conclusao</h2>
+            <p>
+                A normalizacao ajuda a construir bancos de dados
+                mais organizados, reduzindo problemas de insercao,
+                atualizacao e exclusao de informacoes.
+            </p>
         </section>
     </main>
 
     <footer>
-        <p>Licença MIT &copy; 2026 - Projeto Académico de Normalização e Desnormalização</p>
-        <p><a href="https://github.com/exemplo/repositorio-desnormalizacao" style="color: #93c5fd;" target="_blank">Repositório GitHub</a> | Revisão: Outubro de 2026[cite: 5, 8]</p>
+        <p>Artigo academico sobre banco de dados.</p>
     </footer>
 
 </body>
