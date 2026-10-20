@@ -3,15 +3,15 @@
 Repositório oficial criado no âmbito da atividade académica sobre normalização e modelagem de dados.
 
 ## Autores
-Lucas Silva Marques, Estephane Barreto, Matheus dos Santos Chaves, Enzo Ferrari, Rafael Ramos de Lana, Lucas Oliveira Fernandes da Silva.
+Lucas Silva Marques, Lucas Oliveira Fernandes da Silva, Estephane Barreto, Matheus dos Santos Chaves, Enzo Ferrari (Estudantes de TI).
 
 ## Link da Página Web Publicada
-Aceda ao artigo completo em formato web através do link: [GitHub Pages do Projeto](https://exemplo.github.io/repositorio-desnormalizacao)[cite: 5, 8]
+Aceda ao artigo completo em formato web através do link: [GitHub Pages do Projeto](https://github.com/lucassilvalindo/rep_artigo).
 
 ## Como Rodar os Scripts Localmente
 Para testar os scripts SQL do projeto num ambiente limpo, siga os passos abaixo:
 
-1. **SGBD Utilizado:** PostgreSQL (Versão 15 ou superior recomendada)[cite: 6].
+1. **SGBD Utilizado:** PostgreSQL (Versão 15 ou superior recomendada)
 2. **Passos:**
    - Clone o repositório para a sua máquina local.
    - Abra a ferramenta de gestão do PostgreSQL (ex: pgAdmin ou DBeaver).
