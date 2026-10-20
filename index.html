@@ -1,75 +1,438 @@
-
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
+    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Normalizacao de Banco de Dados</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Desnormalização em Bancos de Dados: Quando a Redundância Compensa</title>
+    <style>
+        :root {
+            --primary-color: #1e293b;
+            --accent-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        nav {
+            background-color: #334155;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+        h2 {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.3rem;
+            margin-top: 2rem;
+        }
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 0.9rem;
+        }
+        .authors-card {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 3rem;
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
 <body>
 
     <header>
-        <h1>Normalizacao de Banco de Dados</h1>
-        <p>Organizando dados para evitar repeticoes e erros</p>
+        <h1>Desnormalização em Bancos de Dados</h1>
+        <p>Quando a redundância controlada resolve problemas de desempenho em sistemas de grande escala.</p>
     </header>
 
     <nav>
-        <a href="#introducao">Introducao</a>
-        <a href="#primeira-forma">1FN</a>
-        <a href="#segunda-forma">2FN</a>
-        <a href="#terceira-forma">3FN</a>
-        <a href="#conclusao">Conclusao</a>
+        <a href="#introducao">Introdução</a>
+        <a href="#conceito">Conceito</a>
+        <a href="#desnormalizacao">Desnormalização</a>
+        <a href="#codigo">Código SQL</a>
+        <a href="#referencias">Referências</a>
     </nav>
 
     <main>
+        <section id="autoria" class="authors-card">
+            <h3>Autoria</h3>
+            <p><strong>Autores:</strong>Lucas Silva Marques, Lucas Oliveira Fernandes da Silva, Estephane Barreto, Matheus dos Santos Chaves, Enzo Ferrari</p>
+            <p><small>Publicado em: 15 de junho de 2026 | Última revisão: 15 de outubro de 2026</small></p>
+        </section>
+
         <section id="introducao">
-            <h2>O que e normalizacao?</h2>
-            <p>
-                A normalizacao e um processo de organizacao das tabelas
-                de um banco de dados. Ela ajuda a reduzir repeticoes,
-                evitar inconsistencias e manter as informacoes corretas.
-            </p>
+            <h2>1. Introdução a um Problema Real</h2>
+            <p>Imagine que você gerencia um grande sistema de comércio eletrônico e precisa gerar, várias vezes ao dia, um relatório de vendas por estado. No modelo estritamente normalizado (OLTP), os dados estão divididos em tabelas de clientes, produtos, pedidos e itens de pedido.
+Para montar o relatório, o banco de dados é obrigado a executar múltiplos JOINs em tempo de execução. Quando as tabelas atingem milhões de linhas, o custo dessa operação degrada severamente o desempenho do sistema — o relatório demora dezenas de segundos (ou minutos) e o servidor fica sobrecarregado.
+Neste artigo vamos explorar por que a normalização (1FN, 2FN e 3FN) é fundamental, mas nem sempre é o objetivo final, e como a desnormalização introduz redundância controlada para otimizar leituras.
+Você vai aprender:
+<ul>
+<li>O que são 1FN, 2FN e 3FN e por que elas existem</li>
+<li>A diferença prática entre sistemas OLTP e OLAP</li>
+<li>Quando vale a pena “achatar” tabelas</li>
+<li>Como criar e manter uma tabela desnormalizada de forma segura</li>
+<li>Quais cuidados tomar para não perder consistência dos dados</li>
+</p>
+</ul>
         </section>
 
-        <section id="primeira-forma">
-            <h2>Primeira Forma Normal (1FN)</h2>
-            <p>
-                A 1FN exige que cada campo tenha um unico valor,
-                sem listas de valores dentro da mesma celula.
-            </p>
+        <section id="normalizacao">
+            <h2>2. Por que normalizamos? 1FN, 2FN e 3FN</h2>
+            <p> Antes de desnormalizar, precisamos entender o que a normalização resolve. Vamos usar o mesmo cenário de pedidos de uma loja.
+Tabela inicial (não normalizada)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="tabela-exemplo">
+  <thead>
+    <tr>
+      <th>pedido_id</th>
+      <th>cliente</th>
+      <th>estado</th>
+      <th>produtos</th>
+      <th>quantidades</th>
+      <th>precos</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1001</td>
+      <td>Ana Silva</td>
+      <td>SP</td>
+      <td>Notebook Pro, Mouse Gamer</td>
+      <td>1, 2</td>
+      <td>4500.00, 125.00</td>
+    </tr>
+    <tr>
+      <td>1002</td>
+      <td>Carlos Souza</td>
+      <td>RJ</td>
+      <td>Teclado Mecânico</td>
+      <td>1</td>
+      <td>350.00</td>
+    </tr>
+  </tbody>
+</table>
+Essa tabela tem vários problemas.
+<ul>
+<li>Regra: todos os valores devem ser atômicos (indivisíveis) e não pode haver grupos repetitivos.</li>
+<li>A coluna produtos, quantidades e precos viola a 1FN porque guarda vários valores na mesma célula.</li>
+<li>Solução: separamos em linhas:</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="tabela-exemplo">
+  <thead>
+    <tr>
+      <th>pedido_id</th>
+      <th>cliente</th>
+      <th>estado</th>
+      <th>produto</th>
+      <th>quantidade</th>
+      <th>preco</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1001</td>
+      <td>Ana Silva</td>
+      <td>SP</td>
+      <td>Notebook Pro</td>
+      <td>1</td>
+      <td>4500.00</td>
+    </tr>
+    <tr>
+      <td>1001</td>
+      <td>Ana Silva</td>
+      <td>SP</td>
+      <td>Mouse Gamer</td>
+      <td>2</td>
+      <td>125.00</td>
+    </tr>
+    <tr>
+      <td>1002</td>
+      <td>Carlos Souza</td>
+      <td>RJ</td>
+      <td>Teclado Mecânico</td>
+      <td>1</td>
+      <td>350.00</td>
+    </tr>
+  </tbody>
+</table> 
+Agora está em 1FN, mas ainda temos redundância.
+2FN – Segunda Forma Normal
+Regra: a tabela já deve estar em 1FN e nenhum atributo não-chave pode depender apenas de parte da chave primária (dependência parcial).
+Aqui a chave seria (pedido_id, produto). Porém cliente e estado dependem só de pedido_id, não do produto.
+Solução: separamos as tabelas:
+<ul>
+  <li>pedidos (pedido_id, cliente_id, data)</li>
+  <li>itens_pedido (pedido_id, produto_id, quantidade, valor_unitario)</li>
+  <li>clientes e produtos</li>
+</ul>
+
+3FN – Terceira Forma Normal
+Regra: a tabela já deve estar em 2FN e não pode haver dependência transitiva (um atributo não-chave depender de outro atributo não-chave).
+Se estado dependesse de cliente e não diretamente da chave, ainda teríamos problema. Ao separar a tabela clientes, eliminamos essa dependência transitiva.
+Depois de aplicar 1FN → 2FN → 3FN, chegamos ao modelo limpo:
+<pre><code>CREATE TABLE clientes (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    estado CHAR(2) NOT NULL
+);
+
+CREATE TABLE produtos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    preco NUMERIC(10,2) NOT NULL
+);
+
+CREATE TABLE pedidos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT REFERENCES clientes(id),
+    data_pedido DATE NOT NULL
+);
+
+CREATE TABLE itens_pedido (
+    id SERIAL PRIMARY KEY,
+    pedido_id INT REFERENCES pedidos(id),
+    produto_id INT REFERENCES produtos(id),
+    quantidade INT NOT NULL,
+    valor_unitario NUMERIC(10,2) NOT NULL
+);</code></pre> Esse é o modelo ideal para sistemas OLTP (muitas escritas, integridade garantida).
+</p>
+        </section>"
+
+        <section id="conceito">
+            <h2>3. O Conceito: OLTP vs OLAP</h2>
+            <p>Os sistemas OLTP priorizam integridade e usam exatamente o modelo normalizado acima (1FN, 2FN e 3FN).
+Os sistemas OLAP priorizam velocidade de leitura de relatórios. Eles aceitam redundância controlada porque o custo de vários JOINs em tabelas grandes se torna proibitivo.
+A desnormalização é o passo seguinte: depois de ter o modelo em 3FN, criamos estruturas extras otimizadas para consulta.</p>
+<figure class="figura-oltp">
+    <img
+        class="imagem-oltp"
+        src="modelo-oltp.png"
+        alt="Modelo OLTP normalizado com tabelas relacionadas por chaves estrangeiras"
+    >
+    <figcaption>
+        Modelo normalizado: tabelas separadas e relacionadas
+        por chaves primárias e estrangeiras.
+    </figcaption>
+</figure>
+</section>
+
+        <section id="desnormalizacao">
+            <h2>4. Como funciona a desnormalização</h2>
+            <p>Em vez de manter os dados separados, criamos uma tabela que já contém as informações necessárias para a consulta, mesmo que isso signifique repetir dados do cliente e do produto em cada linha.
+Vantagens:
+<ul>
+    <li>Consultas muito mais rápidas (menos ou nenhum JOIN)</li>
+    <li>Planos de execução mais simples</li>
+    <li>Facilidade de criar índices específicos para o relatório</li>
+</ul>
+
+<ul>
+Custos e cuidados:
+
+<li>>Maior uso de espaço em disco</li>
+<li>Necessidade de mecanismos para manter a consistência (triggers, jobs ou escrita dupla)</li>
+<li>Risco de anomalias se a atualização não for controlada</li>
+
+Regra de ouro: desnormalize apenas o que é lido com muita frequência e quase nunca atualizado.</ul> 
+</p>
+<figure class="tabela-desnormalizada">
+    <img
+        class="imagem-desnormalizada"
+        src="tabela-olap.png"
+        alt="Tabela desnormalizada contendo informações de pedidos, clientes e produtos"
+    >
+    <figcaption>
+        Tabela desnormalizada: contém informações de pedidos, clientes e produtos em uma única estrutura
+
         </section>
 
-        <section id="segunda-forma">
-            <h2>Segunda Forma Normal (2FN)</h2>
-            <p>
-                A 2FN exige que a tabela esteja na 1FN e que cada
-                atributo que nao faz parte de uma chave dependa
-                da chave completa, sem dependencias parciais.
-            </p>
+        <section id="exemplo">
+            <h2>5. Exemplo Prático: A Tabela Achatada</h2>
+            <p>A partir do modelo 3FN, criamos a tabela desnormalizada:
+<pre><code>CREATE TABLE relatorio_vendas_desnormalizado (
+    id SERIAL PRIMARY KEY,
+    pedido_id INT NOT NULL,
+    nome_cliente VARCHAR(100) NOT NULL,
+    estado_cliente CHAR(2) NOT NULL,
+    nome_produto VARCHAR(100) NOT NULL,
+    quantidade INT NOT NULL,
+    valor_total_item NUMERIC(10,2) NOT NULL,
+    data_pedido DATE NOT NULL
+);</pre></code>
+Consulta do relatório (extremamente rápida):
+<pre><code>SELECT 
+    estado_cliente,
+    SUM(valor_total_item) AS total_vendas
+FROM relatorio_vendas_desnormalizado
+GROUP BY estado_cliente
+ORDER BY total_vendas DESC;</code></pre>
+Observe que essa tabela viola de propósito a 2FN e a 3FN (nome do cliente e estado estão repetidos e dependem apenas do pedido). Fizemos isso conscientemente depois de ter o modelo normalizado.
+</p>
         </section>
 
-        <section id="terceira-forma">
-            <h2>Terceira Forma Normal (3FN)</h2>
-            <p>
-                A 3FN exige que a tabela esteja na 2FN e evita
-                dependencias transitivas inadequadas entre atributos
-                que nao fazem parte de uma chave.
-            </p>
+        <section id="codigo">
+            <h2>6. Scripts SQL</h2>
+            <p>Os scripts completos estão no repositório (pasta sql/desnormalizacao.sql).
+Testados no PostgreSQL 16.</p>
+            <pre><code>-- Tabela desnormalizada para relatório de vendas
+CREATE TABLE relatorio_vendas_desnormalizado (
+    id SERIAL PRIMARY KEY,
+    pedido_id INT NOT NULL,
+    nome_cliente VARCHAR(100) NOT NULL,
+    estado_cliente CHAR(2) NOT NULL,
+    nome_produto VARCHAR(100) NOT NULL,
+    quantidade INT NOT NULL,
+    valor_total_item NUMERIC(10,2) NOT NULL,
+    data_pedido DATE NOT NULL
+);
+
+-- Exemplo de inserção (normalmente feita por trigger ou job)
+INSERT INTO relatorio_vendas_desnormalizado 
+    (pedido_id, nome_cliente, estado_cliente, nome_produto, quantidade, valor_total_item, data_pedido)
+VALUES 
+    (1001, 'Ana Silva', 'SP', 'Notebook Pro', 1, 4500.00, '2026-06-10'),
+    (1002, 'Carlos Souza', 'RJ', 'Mouse Gamer', 2, 250.00, '2026-06-11');</code></pre>
+            <p><small>Ver script completo na pasta <code>sql/desnormalizacao.sql</code> no GitHub.</small></p>
         </section>
 
-        <section id="conclusao">
-            <h2>Conclusao</h2>
-            <p>
-                A normalizacao ajuda a construir bancos de dados
-                mais organizados, reduzindo problemas de insercao,
-                atualizacao e exclusao de informacoes.
-            </p>
+        <section id="erros">
+            <h2>7. Erros Comuns</h2>
+            <ul>
+                <li>1- Desnormalizar tudo
+Criar tabelas achatadas para consultas que quase nunca são executadas. Resultado: desperdício de espaço e complexidade desnecessária.</li>
+                <li>2- Esquecer da consistência
+Atualizar a tabela normalizada e não propagar a mudança para a tabela desnormalizada. Isso gera relatórios incorretos.</li>
+                <li>3- Não documentar a origem dos dados
+Outros desenvolvedores não sabem se a tabela é a fonte da verdade ou apenas uma cópia.</li>
+                <li>4- Usar desnormalização em sistemas altamente transacionais
+Em aplicações com muitas escritas concorrentes, a redundância pode se tornar um pesadelo de sincronização.</li>
+                </ul>
+</p>
+        </section>
+
+        <section id="referencias">
+            <h2>8. Referências e Leituras Recomendadas</h2>
+            <ul>
+                <li><a href="https://use-the-index-luke.com/" target="_blank">Use The Index, Luke</a> - Guia web sobre desempenho e índices de bases de dados</li>
+                <li><a href="https://www.postgresql.org/docs/" target="_blank">Documentação Oficial do PostgreSQL</a>.</li>
+                <li><a href="https://dl.acm.org/doi/10.1145/362384.362685" target="_blank">Codd, E. F. (1970). A Relational Model of Data for Large Shared Data Banks</a></li>
+                <li><a href="https://use-the-index-luke.com/" target="_blank"> Use The Index, Luke (Markus Winand) </a></li>
+            </ul>
         </section>
     </main>
 
     <footer>
-        <p>Artigo academico sobre banco de dados.</p>
+        <p>Licença MIT &copy; 2026 - Projeto Académico de Normalização e Desnormalização</p>
+        <p><a href="https://github.com/lucassilvalindo/rep_artigo" style="color: #93c5fd;" target="_blank">Repositório GitHub</a> | Revisão: Outubro de 2026[cite: 5, 8]</p>
     </footer>
 
 </body>
