@@ -1,4 +1,3 @@
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -48,4 +47,33 @@ footer {
     color: white;
     text-align: center;
     padding: 20px;
+}
+
+figure img {
+    width: 105% !important;
+    max-width: 105% !important;
+    height: auto !important;
+}
+
+.tabela-exemplo {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.tabela-exemplo th,
+.tabela-exemplo td {
+  border: 1px solid #ccc;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+
+.tabela-exemplo th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.tabela-exemplo tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
